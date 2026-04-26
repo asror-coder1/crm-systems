@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_id: string
+          marked_by: string | null
+          note: string | null
+          organization_id: string
+          status: Database["public"]["Enums"]["attendance_status"]
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_id: string
+          marked_by?: string | null
+          note?: string | null
+          organization_id: string
+          status?: Database["public"]["Enums"]["attendance_status"]
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          marked_by?: string | null
+          note?: string | null
+          organization_id?: string
+          status?: Database["public"]["Enums"]["attendance_status"]
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -46,6 +97,115 @@ export type Database = {
           meta?: Json | null
         }
         Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          sender_id: string
+          thread_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          sender_id: string
+          thread_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_participants: {
+        Row: {
+          joined_at: string
+          last_read_at: string | null
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          last_read_at?: string | null
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          last_read_at?: string | null
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_participants_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          group_id: string | null
+          id: string
+          is_group: boolean
+          organization_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          group_id?: string | null
+          id?: string
+          is_group?: boolean
+          organization_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          group_id?: string | null
+          id?: string
+          is_group?: boolean
+          organization_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_threads_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_threads_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       events: {
         Row: {
@@ -93,6 +253,243 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedbacks: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          organization_id: string
+          student_id: string
+          teacher_id: string
+          title: string
+          type: Database["public"]["Enums"]["feedback_type"]
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          organization_id: string
+          student_id: string
+          teacher_id: string
+          title: string
+          type?: Database["public"]["Enums"]["feedback_type"]
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          organization_id?: string
+          student_id?: string
+          teacher_id?: string
+          title?: string
+          type?: Database["public"]["Enums"]["feedback_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedbacks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grades: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          lesson_id: string | null
+          max_score: number
+          organization_id: string
+          score: number
+          student_id: string
+          subject_id: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          lesson_id?: string | null
+          max_score?: number
+          organization_id: string
+          score: number
+          student_id: string
+          subject_id: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          lesson_id?: string | null
+          max_score?: number
+          organization_id?: string
+          score?: number
+          student_id?: string
+          subject_id?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grades_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grades_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grades_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string
+          organization_id: string
+          student_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string
+          organization_id: string
+          student_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string
+          organization_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_teachers: {
+        Row: {
+          assigned_at: string
+          group_id: string
+          id: string
+          organization_id: string
+          subject_id: string | null
+          teacher_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          group_id: string
+          id?: string
+          organization_id: string
+          subject_id?: string | null
+          teacher_id: string
+        }
+        Update: {
+          assigned_at?: string
+          group_id?: string
+          id?: string
+          organization_id?: string
+          subject_id?: string | null
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_teachers_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_teachers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_teachers_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          color: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "groups_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -149,6 +546,79 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ends_at: string
+          group_id: string
+          id: string
+          is_canceled: boolean
+          organization_id: string
+          room: string | null
+          starts_at: string
+          subject_id: string
+          teacher_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at: string
+          group_id: string
+          id?: string
+          is_canceled?: boolean
+          organization_id: string
+          room?: string | null
+          starts_at: string
+          subject_id: string
+          teacher_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string
+          group_id?: string
+          id?: string
+          is_canceled?: boolean
+          organization_id?: string
+          room?: string | null
+          starts_at?: string
+          subject_id?: string
+          teacher_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
             referencedColumns: ["id"]
           },
         ]
@@ -275,6 +745,7 @@ export type Database = {
           name: string
           phone: string | null
           slug: string
+          telegram_chat_id: string | null
           updated_at: string
         }
         Insert: {
@@ -288,6 +759,7 @@ export type Database = {
           name: string
           phone?: string | null
           slug: string
+          telegram_chat_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -301,9 +773,97 @@ export type Database = {
           name?: string
           phone?: string | null
           slug?: string
+          telegram_chat_id?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          click_paydoc_id: number | null
+          click_trans_id: number | null
+          created_at: string
+          currency: string
+          error_code: number | null
+          error_note: string | null
+          id: string
+          invoice_id: string | null
+          merchant_trans_id: string | null
+          note: string | null
+          organization_id: string
+          performed_at: string | null
+          provider: string
+          provider_transaction_id: string | null
+          receipt_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          click_paydoc_id?: number | null
+          click_trans_id?: number | null
+          created_at?: string
+          currency?: string
+          error_code?: number | null
+          error_note?: string | null
+          id?: string
+          invoice_id?: string | null
+          merchant_trans_id?: string | null
+          note?: string | null
+          organization_id: string
+          performed_at?: string | null
+          provider?: string
+          provider_transaction_id?: string | null
+          receipt_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          click_paydoc_id?: number | null
+          click_trans_id?: number | null
+          created_at?: string
+          currency?: string
+          error_code?: number | null
+          error_note?: string | null
+          id?: string
+          invoice_id?: string | null
+          merchant_trans_id?: string | null
+          note?: string | null
+          organization_id?: string
+          performed_at?: string | null
+          provider?: string
+          provider_transaction_id?: string | null
+          receipt_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -315,6 +875,7 @@ export type Database = {
           is_active: boolean
           organization_id: string | null
           phone: string | null
+          telegram_chat_id: string | null
           updated_at: string
           username: string
         }
@@ -327,6 +888,7 @@ export type Database = {
           is_active?: boolean
           organization_id?: string | null
           phone?: string | null
+          telegram_chat_id?: string | null
           updated_at?: string
           username: string
         }
@@ -339,12 +901,57 @@ export type Database = {
           is_active?: boolean
           organization_id?: string | null
           phone?: string | null
+          telegram_chat_id?: string | null
           updated_at?: string
           username?: string
         }
         Relationships: [
           {
             foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          code: string | null
+          color: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          code?: string | null
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string | null
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subjects_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -397,6 +1004,9 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_group_teacher: { Args: { _group_id: string }; Returns: boolean }
+      is_org_manager: { Args: { _org_id: string }; Returns: boolean }
+      is_thread_participant: { Args: { _thread_id: string }; Returns: boolean }
       send_notification: {
         Args: {
           _body?: string
@@ -424,6 +1034,8 @@ export type Database = {
         | "administrator"
         | "teacher"
         | "student"
+      attendance_status: "present" | "absent" | "late" | "excused"
+      feedback_type: "positive" | "negative" | "neutral"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -552,6 +1164,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "administrator", "teacher", "student"],
+      attendance_status: ["present", "absent", "late", "excused"],
+      feedback_type: ["positive", "negative", "neutral"],
     },
   },
 } as const

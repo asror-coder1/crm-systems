@@ -53,6 +53,7 @@ interface UserRow {
   organization_id: string | null;
   is_active: boolean;
   roles: AppRole[];
+  telegram_chat_id: string | null;
   created_at: string;
 }
 
@@ -98,6 +99,7 @@ export default function UsersManager({ filterRole, title, description }: Props) 
     email: "",
     phone: "",
     organization_id: "",
+    telegram_chat_id: "",
   });
 
   const load = async () => {
@@ -127,6 +129,7 @@ export default function UsersManager({ filterRole, title, description }: Props) 
       email: "",
       phone: "",
       organization_id: "",
+      telegram_chat_id: "",
     });
   };
 
@@ -141,6 +144,7 @@ export default function UsersManager({ filterRole, title, description }: Props) 
       email: u.email ?? "",
       phone: u.phone ?? "",
       organization_id: u.organization_id ?? "",
+      telegram_chat_id: u.telegram_chat_id ?? "",
     });
     setOpen(true);
   };
@@ -157,6 +161,7 @@ export default function UsersManager({ filterRole, title, description }: Props) 
           phone: form.phone || null,
           organization_id: form.organization_id || null,
           role: form.role,
+          telegram_chat_id: form.telegram_chat_id || null,
         },
       });
       if (error) { toast.error(error.message); setSubmitting(false); return; }
@@ -178,7 +183,12 @@ export default function UsersManager({ filterRole, title, description }: Props) 
       const parsed = createSchema.safeParse(form);
       if (!parsed.success) { toast.error(parsed.error.errors[0].message); setSubmitting(false); return; }
       const { error } = await supabase.functions.invoke("admin-users", {
-        body: { action: "create", ...parsed.data, organization_id: parsed.data.organization_id || null },
+        body: {
+          action: "create",
+          ...parsed.data,
+          organization_id: parsed.data.organization_id || null,
+          telegram_chat_id: form.telegram_chat_id || null,
+        },
       });
       if (error) { toast.error(error.message); setSubmitting(false); return; }
       await supabase.rpc("write_audit", {
@@ -338,6 +348,24 @@ export default function UsersManager({ filterRole, title, description }: Props) 
                   />
                 </div>
               </div>
+              {(form.role === "admin" || form.role === "administrator") && (
+                <div className="grid gap-2">
+                  <Label className="flex items-center gap-2">
+                    Telegram Chat ID
+                    <span className="text-xs text-muted-foreground font-normal">
+                      (to'lov xabarlari shu yerga keladi)
+                    </span>
+                  </Label>
+                  <Input
+                    value={form.telegram_chat_id}
+                    onChange={(e) => setForm((f) => ({ ...f, telegram_chat_id: e.target.value.trim() }))}
+                    placeholder="masalan: 123456789"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Chat ID ni olish uchun @userinfobot ga /start yuboring
+                  </p>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="ghost" onClick={() => setOpen(false)}>Bekor</Button>

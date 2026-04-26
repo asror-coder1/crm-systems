@@ -1,26 +1,15 @@
-import { useState } from "react";
+import { useState, ComponentType } from "react";
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
-  LayoutDashboard,
-  Building2,
-  Users,
   GraduationCap,
-  UserCog,
-  Calendar as CalendarIcon,
-  MessagesSquare,
-  Wallet,
-  Settings,
-  User as UserIcon,
   LogOut,
   ChevronRight,
-  Activity,
   Menu,
   X,
   Search,
-  Command as CommandIcon,
   Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,30 +17,27 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import NotificationsBell from "@/components/NotificationsBell";
 import ThemeToggle from "@/components/ThemeToggle";
-import CommandPalette from "@/components/CommandPalette";
 
-const nav = [
-  { to: "/super-admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/super-admin/organizations", label: "Tashkilotlar", icon: Building2 },
-  { to: "/super-admin/users", label: "Barcha foydalanuvchilar", icon: Users },
-  { to: "/super-admin/admins", label: "Adminlar", icon: UserCog },
-  { to: "/super-admin/teachers", label: "O'qituvchilar", icon: GraduationCap },
-  { to: "/super-admin/students", label: "Talabalar", icon: Users },
-  { to: "/super-admin/audit", label: "Audit jurnali", icon: Activity },
-  { to: "/super-admin/finance", label: "Moliya", icon: Wallet },
-  { to: "/super-admin/calendar", label: "Kalendar", icon: CalendarIcon },
-  { to: "/super-admin/messages", label: "Xabarlar", icon: MessagesSquare },
-  { to: "/super-admin/profile", label: "Profil", icon: UserIcon },
-  { to: "/super-admin/settings", label: "Sozlamalar", icon: Settings },
-];
+export interface NavItem {
+  to: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+}
 
-export default function SuperAdminLayout() {
+interface RoleLayoutProps {
+  brand: string;
+  subtitle: string;
+  nav: NavItem[];
+  accent?: "primary" | "secondary" | "accent";
+}
+
+export default function RoleLayout({ brand, subtitle, nav }: RoleLayoutProps) {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const initials = (profile?.full_name || profile?.username || "S A")
+  const initials = (profile?.full_name || profile?.username || "U")
     .split(" ")
     .map((p) => p[0])
     .slice(0, 2)
@@ -72,8 +58,8 @@ export default function SuperAdminLayout() {
             <GraduationCap className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <p className="font-display font-semibold leading-tight">EduCore</p>
-            <p className="text-xs text-muted-foreground">Super Admin</p>
+            <p className="font-display font-semibold leading-tight">{brand}</p>
+            <p className="text-xs text-muted-foreground">{subtitle}</p>
           </div>
         </div>
       </div>
@@ -83,6 +69,7 @@ export default function SuperAdminLayout() {
           <NavLink
             key={item.to}
             to={item.to}
+            end
             onClick={() => setMobileOpen(false)}
             className={({ isActive }) =>
               cn(
@@ -125,14 +112,10 @@ export default function SuperAdminLayout() {
 
   return (
     <div className="min-h-screen flex w-full bg-background">
-      <CommandPalette />
-
-      {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 shrink-0 border-r border-sidebar-border bg-sidebar flex-col">
         <SidebarContent />
       </aside>
 
-      {/* Mobile Drawer */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -153,6 +136,7 @@ export default function SuperAdminLayout() {
               <button
                 onClick={() => setMobileOpen(false)}
                 className="absolute top-4 right-4 p-1 rounded-md hover:bg-muted z-10"
+                aria-label="Yopish"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -162,7 +146,6 @@ export default function SuperAdminLayout() {
         )}
       </AnimatePresence>
 
-      {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 border-b border-border bg-card/40 backdrop-blur-xl flex items-center justify-between px-4 md:px-6 sticky top-0 z-30">
           <div className="flex items-center gap-3">
@@ -177,28 +160,19 @@ export default function SuperAdminLayout() {
             </Button>
             <div className="hidden sm:block">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                Super Admin Panel
+                {subtitle}
               </p>
               <p className="font-display font-semibold text-sm">
-                Salom, {profile?.full_name || profile?.username || "Admin"} 👋
+                Salom, {profile?.full_name || profile?.username || "User"} 👋
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1 md:gap-2">
-            <button
-              onClick={() => {
-                const e = new KeyboardEvent("keydown", { key: "k", metaKey: true });
-                window.dispatchEvent(e);
-              }}
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/40 text-xs text-muted-foreground hover:bg-muted transition-smooth"
-            >
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/40 text-xs text-muted-foreground">
               <Search className="h-3.5 w-3.5" />
               <span>Qidirish</span>
-              <kbd className="ml-2 px-1.5 py-0.5 rounded bg-background border border-border text-[10px] font-mono">
-                ⌘K
-              </kbd>
-            </button>
+            </div>
             <ThemeToggle />
             <NotificationsBell />
             <Avatar className="h-9 w-9 border border-primary/30">

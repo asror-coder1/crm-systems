@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "create") {
-      const { username, password, full_name, email, phone, role, organization_id } = body;
+      const { username, password, full_name, email, phone, role, organization_id, telegram_chat_id } = body;
       if (!isValidUsername(username)) return json({ error: "Username noto'g'ri (a-z, 0-9, _.-, 3-40)" }, 400);
       if (!isStrongPassword(password)) return json({ error: "Parol 6-100 belgi bo'lishi kerak" }, 400);
       if (!ROLES.includes(role)) return json({ error: "Role noto'g'ri" }, 400);
@@ -102,13 +102,14 @@ Deno.serve(async (req) => {
         await admin.from("profiles").update({
           email: email ?? null,
           phone: phone ?? null,
+          telegram_chat_id: telegram_chat_id ?? null,
         }).eq("id", created.user.id);
       }
       return json({ ok: true, user_id: created.user?.id });
     }
 
     if (action === "update") {
-      const { user_id, full_name, email, phone, organization_id, role, is_active } = body;
+      const { user_id, full_name, email, phone, organization_id, role, is_active, telegram_chat_id } = body;
       if (!user_id) return json({ error: "user_id required" }, 400);
       const updates: Record<string, unknown> = {};
       if (full_name !== undefined) updates.full_name = full_name;
@@ -116,6 +117,7 @@ Deno.serve(async (req) => {
       if (phone !== undefined) updates.phone = phone;
       if (organization_id !== undefined) updates.organization_id = organization_id;
       if (is_active !== undefined) updates.is_active = is_active;
+      if (telegram_chat_id !== undefined) updates.telegram_chat_id = telegram_chat_id;
       if (Object.keys(updates).length) {
         const { error } = await admin.from("profiles").update(updates).eq("id", user_id);
         if (error) return json({ error: error.message }, 400);
